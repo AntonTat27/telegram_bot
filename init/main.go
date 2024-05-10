@@ -9,6 +9,12 @@ import (
 	"os"
 	"os/signal"
 	"telegramBotTask/internal"
+	"telegramBotTask/storage"
+)
+
+const (
+	messagesTableNamespace         = "messages"
+	filteredMessagesTableNamespace = "filtered_messages"
 )
 
 func main() {
@@ -29,13 +35,19 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	
+
+	// Creating storage
+	messageStorage := storage.InitMessagesDB(db, messagesTableNamespace, filteredMessagesTableNamespace)
+
+	// Creating a handler
+	messageHandler := internal.InitMessageHandler(messageStorage)
+
 	// Creating a bot
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
 	opts := []bot.Option{
-		bot.WithDefaultHandler(internal.Handler),
+		bot.WithDefaultHandler(messageHandler.DefaultHandler),
 	}
 
 	b, err := bot.New(token, opts...)
@@ -44,7 +56,7 @@ func main() {
 	}
 
 	// Registering handlers and starting the bot
-	b.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, internal.MyStartHandler)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, messageHandler.MyStartHandler)
 
 	b.Start(ctx)
 }
