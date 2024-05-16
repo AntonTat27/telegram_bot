@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"regexp"
 	"telegramBotTask/internal"
 	"telegramBotTask/storage"
 )
@@ -59,6 +60,9 @@ func main() {
 
 	// Registering handlers and starting the bot
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, messageHandler.MyStartHandler)
+
+	re := regexp.MustCompile(`^/filter`)
+	b.RegisterHandlerRegexp(bot.HandlerTypeMessageText, re, messageHandler.SetFilterHandler)
 
 	b.Start(ctx)
 }
