@@ -9,7 +9,7 @@ import (
 func getenvStr(key string) string {
 	res := os.Getenv(key)
 	if res == "" {
-		log.Fatal("the variable is empty")
+		log.Fatalf("the variable '%s' is empty", key)
 	}
 
 	return res

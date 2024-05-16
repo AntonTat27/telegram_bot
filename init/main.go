@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-telegram/bot"
+	_ "github.com/lib/pq"
 	"log"
 	"os"
 	"os/signal"
@@ -18,6 +19,7 @@ const (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
 	// Taking all env variables
 	host := getenvStr("DATABASE_HOST")
 	port := getenvInt("DATABASE_PORT")
