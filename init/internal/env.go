@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// GetEnvStr gets env variable by key
 func GetEnvStr(key string) string {
 	res := os.Getenv(key)
 	if res == "" {
@@ -15,6 +16,7 @@ func GetEnvStr(key string) string {
 	return res
 }
 
+// GetEnvInt gets env variable by key and converts it to int
 func GetEnvInt(key string) int {
 	temp := GetEnvStr(key)
 

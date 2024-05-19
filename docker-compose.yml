@@ -1,0 +1,52 @@
+version: '3.7'
+services:
+  db-psql:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres1!
+    ports:
+      - 5435:5432
+    volumes :
+      - ./db-data:/var/lib/postgresql/data
+    networks :
+      default :
+        aliases :
+          - postgres-db
+
+  db-psql-migrate:
+    depends_on:
+      - db-psql
+    image:
+      postgres
+    environment :
+      - POSTGRES_USER=postgres
+      - PGPASSWORD=postgres1!
+    volumes :
+      - type : bind
+        source : ./init/scripts
+        target : /migrations
+    command :
+      - sh
+      - -c
+      - |
+        echo "SELECT 'CREATE DATABASE telegram_records' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'telegram_records')\gexec" | psql -U postgres -h postgres-db -p 5432 
+                for migration_file in $(ls migrations/*.sql); do 
+                  echo $$migration_file;
+                  psql -U postgres -h postgres-db -p 5432  -d telegram_records -f $$migration_file;
+                done
+
+  telegram-bot:
+    image: antontat/telegram_bot:latest
+    depends_on:
+      - db-psql
+      - db-psql-migrate
+    ports:
+      - '8080:8080'
+    environment:
+      - DATABASE_HOST=postgres-db
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres1!
+      - DATABASE_NAME=telegram_records
+      - TELEGRAM_BOT_TOKEN=6819302500:AAGkjHti42jaNw-SENgRJLRXNqKIh-cwC0w
