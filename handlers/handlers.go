@@ -15,16 +15,20 @@ type MessagesHandler struct {
 	filterWord string
 }
 
+// InitMessageHandler initializes a MessagesHandler with the given messagesDB and sets the filterWord to an empty string.
 func InitMessageHandler(messagesDB storage.MessagesDB) MessagesHandler {
 	res := MessagesHandler{messagesDB: messagesDB, filterWord: ""}
 	return res
 }
 
+// DefaultHandler handles the incoming message by checking if it contains the filter word and saving it accordingly in the database.
 func (h *MessagesHandler) DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	resp := "Message is saved successfully"
 	var err error
 
+	// Checking if the message contains the filter word
 	if (strings.Contains(update.Message.Text, h.filterWord)) && (h.filterWord != "") {
+		// If there is a filter word, save the message to the table with filtered messages
 		err := h.messagesDB.AddFilteredMessage(update.Message.Date, update.Message.Text, update.Message.From.ID, update.Message.ID, h.filterWord)
 
 		if err != nil {
@@ -35,6 +39,7 @@ func (h *MessagesHandler) DefaultHandler(ctx context.Context, b *bot.Bot, update
 			resp += fmt.Sprintf("\n \nThe message has macthed the filter as it contains the word '%s'", h.filterWord)
 		}
 	} else {
+		// If there is no filter word, save the message to the table with unfiltered messages
 		err := h.messagesDB.AddNewMessage(update.Message.Date, update.Message.Text, update.Message.From.ID, update.Message.ID)
 
 		if err != nil {
@@ -44,6 +49,7 @@ func (h *MessagesHandler) DefaultHandler(ctx context.Context, b *bot.Bot, update
 		}
 	}
 
+	// Sending response
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:          update.Message.Chat.ID,
 		Text:            resp,
@@ -51,14 +57,18 @@ func (h *MessagesHandler) DefaultHandler(ctx context.Context, b *bot.Bot, update
 	})
 
 	if err != nil {
-		return
+		log.Println(err)
 	}
 }
 
+// SetFilterHandler sets the filter word for message filtering..
 func (h *MessagesHandler) SetFilterHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	// Extracting the filter word from the message text
 	word, _ := strings.CutPrefix(update.Message.Text, "/filter")
 	word = strings.TrimSpace(word)
 	resp := ""
+
+	// If filter word is not given, return an error. Otherwise, set filterWord to the word given
 	if word == "" {
 		resp = "*Error*\nNo filter word specified"
 	} else {
@@ -66,6 +76,7 @@ func (h *MessagesHandler) SetFilterHandler(ctx context.Context, b *bot.Bot, upda
 		resp = fmt.Sprintf("All messages are now filtered by the word '%s'", h.filterWord)
 	}
 
+	// Sending success message if the word is set and error otherwise
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    update.Message.Chat.ID,
 		Text:      resp,
