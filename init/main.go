@@ -10,8 +10,9 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
-	"telegramBotTask/internal"
-	"telegramBotTask/storage"
+	"telegram_bot/handlers"
+	"telegram_bot/init/internal"
+	"telegram_bot/storage"
 )
 
 const (
@@ -22,12 +23,12 @@ const (
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
 	// Taking all env variables
-	host := getenvStr("DATABASE_HOST")
-	port := getenvInt("DATABASE_PORT")
-	user := getenvStr("DATABASE_USER")
-	password := getenvStr("DATABASE_PASSWORD")
-	dbname := getenvStr("DATABASE_NAME")
-	token := getenvStr("TELEGRAM_BOT_TOKEN")
+	host := internal.GetEnvStr("DATABASE_HOST")
+	port := internal.GetEnvInt("DATABASE_PORT")
+	user := internal.GetEnvStr("DATABASE_USER")
+	password := internal.GetEnvStr("DATABASE_PASSWORD")
+	dbname := internal.GetEnvStr("DATABASE_NAME")
+	token := internal.GetEnvStr("TELEGRAM_BOT_TOKEN")
 
 	// Connecting to a database
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -43,7 +44,7 @@ func main() {
 	messageStorage := storage.InitMessagesDB(db, messagesTableNamespace, filteredMessagesTableNamespace)
 
 	// Creating a handler
-	messageHandler := internal.InitMessageHandler(messageStorage)
+	messageHandler := handlers.InitMessageHandler(messageStorage)
 
 	// Creating a bot
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)

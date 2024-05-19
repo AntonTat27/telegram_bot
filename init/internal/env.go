@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func getenvStr(key string) string {
+func GetEnvStr(key string) string {
 	res := os.Getenv(key)
 	if res == "" {
 		log.Fatalf("the variable '%s' is empty", key)
@@ -15,8 +15,8 @@ func getenvStr(key string) string {
 	return res
 }
 
-func getenvInt(key string) int {
-	temp := getenvStr(key)
+func GetEnvInt(key string) int {
+	temp := GetEnvStr(key)
 
 	res, err := strconv.Atoi(temp)
 
