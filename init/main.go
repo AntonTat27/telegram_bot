@@ -43,7 +43,7 @@ func main() {
 	// Creating storage
 	messageStorage := storage.InitMessagesDB(db, messagesTableNamespace, filteredMessagesTableNamespace)
 
-	// Creating a handler
+	// Creating handler
 	messageHandler := handlers.InitMessageHandler(messageStorage)
 
 	// Creating a bot
