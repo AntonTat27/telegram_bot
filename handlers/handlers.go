@@ -16,7 +16,7 @@ type MessagesHandler struct {
 }
 
 func InitMessageHandler(messagesDB storage.MessagesDB) MessagesHandler {
-	res := MessagesHandler{messagesDB: messagesDB, filterWord: "filter"}
+	res := MessagesHandler{messagesDB: messagesDB, filterWord: ""}
 	return res
 }
 
@@ -24,7 +24,7 @@ func (h *MessagesHandler) DefaultHandler(ctx context.Context, b *bot.Bot, update
 	resp := "Message is saved successfully"
 	var err error
 
-	if strings.Contains(update.Message.Text, h.filterWord) {
+	if (strings.Contains(update.Message.Text, h.filterWord)) && (h.filterWord != "") {
 		err := h.messagesDB.AddFilteredMessage(update.Message.Date, update.Message.Text, update.Message.From.ID, update.Message.ID, h.filterWord)
 
 		if err != nil {
@@ -57,10 +57,13 @@ func (h *MessagesHandler) DefaultHandler(ctx context.Context, b *bot.Bot, update
 
 func (h *MessagesHandler) SetFilterHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	word, _ := strings.CutPrefix(update.Message.Text, "/filter")
-	h.filterWord = strings.Trim(word, " ")
-	resp := fmt.Sprintf("All messages are now filtered by the word '_%s_'", h.filterWord)
-	if h.filterWord == "" {
+	word = strings.TrimSpace(word)
+	resp := ""
+	if word == "" {
 		resp = "*Error*\nNo filter word specified"
+	} else {
+		h.filterWord = word
+		resp = fmt.Sprintf("All messages are now filtered by the word '%s'", h.filterWord)
 	}
 
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
