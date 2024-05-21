@@ -17,8 +17,6 @@ FROM alpine:latest
 RUN apk update && \
     apk add --no-cache curl bash
 
-ENV PORT 80
-
 RUN mkdir  /key
 
 WORKDIR /app
@@ -28,10 +26,5 @@ COPY --from=builder /app ./
 
 RUN apk update && \
     apk add --no-cache curl bash
-
-HEALTHCHECK --interval=30s --start-period=1m --timeout=30s --retries=3 \
-    CMD curl --silent --fail --fail-early http://127.0.0.1:$PORT/about || exit 1
-
-EXPOSE $PORT
 
 ENTRYPOINT ["/app/telegram_bot"]
