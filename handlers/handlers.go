@@ -25,27 +25,30 @@ func InitMessageHandler(messagesDB storage.MessagesDB) MessagesHandler {
 func (h *MessagesHandler) DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	resp := "Message is saved successfully"
 	var err error
-
-	// Checking if the message contains the filter word
-	if (strings.Contains(update.Message.Text, h.filterWord)) && (h.filterWord != "") {
-		// If there is a filter word, save the message to the table with filtered messages
-		err := h.messagesDB.AddFilteredMessage(update.Message.Date, update.Message.Text, update.Message.From.ID, update.Message.ID, h.filterWord)
-
-		if err != nil {
-			errMessage := fmt.Errorf("couldn't save the message in database, err: %s", err)
-			log.Println(errMessage)
-			resp = "The message has matched the filter but was not saved as the bot had encountered an error."
-		} else {
-			resp += fmt.Sprintf("\n \nThe message has macthed the filter as it contains the word '%s'", h.filterWord)
-		}
+	if update.Message == nil {
+		resp = "*Error*\nThe message is empty"
 	} else {
-		// If there is no filter word, save the message to the table with unfiltered messages
-		err := h.messagesDB.AddNewMessage(update.Message.Date, update.Message.Text, update.Message.From.ID, update.Message.ID)
+		// Checking if the message contains the filter word
+		if (strings.Contains(update.Message.Text, h.filterWord)) && (h.filterWord != "") {
+			// If there is a filter word, save the message to the table with filtered messages
+			err := h.messagesDB.AddFilteredMessage(update.Message.Date, update.Message.Text, update.Message.From.ID, update.Message.ID, h.filterWord)
 
-		if err != nil {
-			errMessage := fmt.Errorf("couldn't save the message in database, err: %s", err)
-			log.Println(errMessage)
-			resp = "The message was not saved as the bot had encountered an error."
+			if err != nil {
+				errMessage := fmt.Errorf("couldn't save the message in database, err: %s", err)
+				log.Println(errMessage)
+				resp = "The message has matched the filter but was not saved as the bot had encountered an error."
+			} else {
+				resp += fmt.Sprintf("\n \nThe message has macthed the filter as it contains the word '%s'", h.filterWord)
+			}
+		} else {
+			// If there is no filter word, save the message to the table with unfiltered messages
+			err := h.messagesDB.AddNewMessage(update.Message.Date, update.Message.Text, update.Message.From.ID, update.Message.ID)
+
+			if err != nil {
+				errMessage := fmt.Errorf("couldn't save the message in database, err: %s", err)
+				log.Println(errMessage)
+				resp = "The message was not saved as the bot had encountered an error."
+			}
 		}
 	}
 
@@ -54,6 +57,7 @@ func (h *MessagesHandler) DefaultHandler(ctx context.Context, b *bot.Bot, update
 		ChatID:          update.Message.Chat.ID,
 		Text:            resp,
 		ReplyParameters: &models.ReplyParameters{ChatID: update.Message.Chat.ID, MessageID: update.Message.ID},
+		ParseMode:       models.ParseModeMarkdown,
 	})
 
 	if err != nil {
