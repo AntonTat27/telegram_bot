@@ -49,4 +49,4 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres1!
       - DATABASE_NAME=telegram_records
-      - TELEGRAM_BOT_TOKEN=6819302500:AAGkjHti42jaNw-SENgRJLRXNqKIh-cwC0w
+      - TELEGRAM_BOT_TOKEN=TELEGRAM_TOKEN
