@@ -2,11 +2,6 @@
 
 This project is a Telegram bot developed using Golang and PostgreSQL. The bot saves all messages sent in a chat and stores messages that contain a specific filter word in a separate table.
 
-## Requirements
-
-- Docker
-- 
-
 ## Setup and Usage
 
 ### Starting the Services
