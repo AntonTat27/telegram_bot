@@ -16,6 +16,7 @@ This project is a Telegram bot developed using Golang and PostgreSQL. The bot sa
     ```
    This command will pull the necessary images from Docker Hub and start all services.
 
+   The database is at port 5435.
 3. **Send commands to the bot:**
     - The bot has the following username: **@message_filtering2_bot** (https://t.me/message_filtering2_bot)
     - **/start**: The bot will respond with a welcome message.
