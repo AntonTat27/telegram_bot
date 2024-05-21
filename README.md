@@ -11,16 +11,20 @@ This project is a Telegram bot developed using Golang and PostgreSQL. The bot sa
 
 ### Starting the Services
 
-1. **Start all services:**
+1. **Add your telegram bot token:**
+   - Go to docker-compose.yml and on 52nd line you will see the following: "TELEGRAM_BOT_TOKEN=TELEGRAM_TOKEN"
+   - Replace "TELEGRAM_TOKEN" with your token.
+
+2. **Start all services:**
     ```sh
     docker-compose up
     ```
    This command will pull the necessary images from Docker Hub and start all services.
 
-   2. **Send commands to the bot:**
-       - **/start**: The bot will respond with a welcome message.
-       - **/filter + word**: The bot will save the word and filter messages by it.
-       - Any other message will be saved to one of the tables, depending on whether it contains the filter word or not.
+3. **Send commands to the bot:**
+    - **/start**: The bot will respond with a welcome message.
+    - **/filter + word**: The bot will save the word and filter messages by it.
+    - Any other message will be saved to one of the tables, depending on whether it contains the filter word or not.
 
 ### Checking the Database
 
